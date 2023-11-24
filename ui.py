@@ -18,7 +18,7 @@ class QuizInterface:
         self.q_score = Label(text=f'Score: {self.quiz.score}', bg=THEME_COLOR, fg='white', font=('Ariel', 10, 'normal'))
         self.q_score.grid(column=1, row=0)
 
-        self.q_canvas = Canvas(height=250, width=300)
+        self.q_canvas = Canvas(height=250, width=300, bg='white')
         self.question_text = self.q_canvas.create_text(150, 125, text='Some Text', font=('Ariel', 20, 'italic'),
                                                        fill=THEME_COLOR, width=280)
         self.q_canvas.grid(column=0, row=1, columnspan=2, pady=20, padx=20)
@@ -36,13 +36,21 @@ class QuizInterface:
     def get_next_question(self):
         q_text = self.quiz.next_question()
         self.q_canvas.itemconfig(self.question_text, text=q_text)
+        self.q_canvas.configure(bg='white')
 
     def answer_is_true(self):
-        self.quiz.check_answer('true')
-        self.get_next_question()
+        self.give_feedback(self.quiz.check_answer('true'))
         self.q_score.config(text=f'Score: {self.quiz.score}')
 
     def answer_is_false(self):
-        self.quiz.check_answer('false')
-        self.get_next_question()
+        self.give_feedback(self.quiz.check_answer('false'))
         self.q_score.config(text=f'Score: {self.quiz.score}')
+
+    def give_feedback(self, is_right):
+        if is_right:
+            self.q_canvas.configure(bg='green')
+            self.window.after(1000, self.get_next_question)
+        else:
+            self.q_canvas.configure(bg='red')
+            self.window.after(1000, self.get_next_question)
+
